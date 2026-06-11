@@ -1,0 +1,295 @@
+<div class="container mt-5" *ngIf="servicio() as s">
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb bg-transparent p-0">
+      <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-secondary">Inicio</a></li>
+      <li class="breadcrumb-item active fw-bold" style="color: #004e64;">{{ s.nombre }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-5 align-items-start">
+
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge rounded-pill px-3 py-2" style="background-color: #00afca; color: white;">{{ s.categoria }}</span>
+          <div class="text-warning small" *ngIf="comentarios().length > 0">
+            <i class="bi bi-star-fill"></i> ★ {{ calcularPromedio() }} ({{ comentarios().length }} opiniones)
+          </div>
+        </div>
+        <h1 class="fw-bolder display-5 mb-2" style="color: #004e64;">{{ s.nombre }}</h1>
+        <p class="fs-5 text-secondary">
+          <i class="bi bi-geo-alt-fill text-danger"></i> {{ s.ubicacion || 'Islas Galápagos' }}
+        </p>
+      </div>
+
+      <div class="rounded-5 overflow-hidden shadow-lg mb-5">
+        <img [src]="s.imagenUrl || 'https://images.unsplash.com/photo-1583212292454-1fe6229603b7'"
+             class="img-fluid w-100"
+             style="max-height: 500px; object-fit: cover;"
+             [alt]="s.nombre">
+      </div>
+
+      <div class="mb-5">
+        <h4 class="fw-bold mb-3" style="color: #004e64;">Sobre esta experiencia</h4>
+        <p class="text-secondary fs-5" style="line-height: 1.8; font-weight: 300;">
+          {{ s.descripcion }}
+        </p>
+
+        <div class="row mt-5 g-4">
+          <div class="col-md-4">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-light border-0">
+              <span class="fs-3">🛡️</span>
+              <span class="small fw-bold text-dark">Cancelación Flexible</span>
+            </div>
+          </div>
+
+          <div class="col-md-4" *ngIf="s.tieneWifi">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-light border-0">
+              <span class="fs-3">📶</span>
+              <span class="small fw-bold text-dark">Wifi Alta Velocidad</span>
+            </div>
+          </div>
+
+          <div class="col-md-4" *ngIf="s.tieneDesayuno">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-light border-0">
+              <span class="fs-3">🥘</span>
+              <span class="small fw-bold text-dark">Desayuno Local</span>
+            </div>
+          </div>
+
+          <div class="col-md-4" *ngIf="s.tieneTransporte">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-light border-0">
+              <span class="fs-3">🚤</span>
+              <span class="small fw-bold text-dark">Transporte en Lancha</span>
+            </div>
+          </div>
+
+          <div class="col-md-4" *ngIf="s.tieneEquipo">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-light border-0">
+              <span class="fs-3">🤿</span>
+              <span class="small fw-bold text-dark">Equipo Incluido</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 pt-4 border-top" *ngIf="s.detallesDinamicos && s.detallesDinamicos.length > 0">
+
+        <div *ngIf="s.categoria === 'EXCURSION'">
+          <h4 class="fw-bold mb-4" style="color: #004e64;">Hoja de Ruta</h4>
+          <div class="timeline-container">
+            <div class="timeline-item" *ngFor="let punto of s.detallesDinamicos; let last = last" [class.last]="last">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <p class="text-dark fw-medium fs-5 mb-0">{{ punto.detalleTexto }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="s.categoria === 'HOTEL'">
+          <h4 class="fw-bold mb-4" style="color: #004e64;">Políticas y Horarios</h4>
+          <div class="row g-3">
+            <div class="col-md-6" *ngFor="let norma of s.detallesDinamicos">
+              <div class="p-3 rounded-4 bg-light border border-light-subtle shadow-sm">
+                <h6 class="fw-bold text-dark mb-1">
+                  <i class="bi bi-info-circle-fill text-primary me-2"></i>Información
+                </h6>
+                <p class="text-secondary m-0 small">{{ norma.detalleTexto }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-5 pt-4 border-top">
+        <h4 class="fw-bold mb-4" style="color: #004e64;">Opiniones de viajeros</h4>
+
+        <div class="card p-4 mb-4 rounded-4 shadow-sm border-0 bg-light" *ngIf="isLoggedIn()">
+          <h6 class="fw-bold">Deja tu opinión</h6>
+          <form #comentarioForm="ngForm">
+            <select [(ngModel)]="puntuacion" name="puntuacion" class="form-select mb-2 w-25" required>
+              <option value="5">5 ⭐⭐⭐⭐⭐</option>
+              <option value="4">4 ⭐⭐⭐⭐</option>
+              <option value="3">3 ⭐⭐⭐</option>
+              <option value="2">2 ⭐⭐</option>
+              <option value="1">1 ⭐</option>
+            </select>
+            <textarea [(ngModel)]="textoComentario" name="texto" class="form-control mb-2" placeholder="Cuéntanos qué tal tu experiencia..." required minlength="5"></textarea>
+            <button (click)="enviarComentario()" [disabled]="comentarioForm.invalid" class="btn btn-primary rounded-pill">Publicar opinión</button>
+          </form>
+        </div>
+
+        <div *ngFor="let c of comentarios()" class="card mb-3 border-0 shadow-sm rounded-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <strong class="text-primary">{{ c.usuario.nombre }}</strong>
+                <span class="text-muted small ms-2">• {{ c.fechaPublicacion | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <span class="text-warning fw-bold">{{ c.puntuacion }} ⭐</span>
+                <button *ngIf="isAdmin()"
+                        (click)="eliminarComentario(c.id)"
+                        class="btn btn-sm btn-outline-danger rounded-circle border-0"
+                        title="Eliminar comentario">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </div>
+            </div>
+            <p class="mt-2 text-dark">{{ c.texto }}</p>
+
+            <div *ngIf="c.respuestaAdmin" class="bg-light p-3 mt-2 rounded-3 border-start border-4 border-info">
+              <small class="text-info fw-bold">Respuesta del administrador:</small>
+              <p class="mb-0 text-secondary">{{ c.respuestaAdmin }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-lg rounded-5 sticky-panel overflow-hidden">
+        <div class="p-1" style="background: linear-gradient(90deg, #00afca, #ff6b35);"></div>
+        <div class="card-body p-4">
+
+          <div *ngIf="!pasoConfirmacion() && !reservaConfirmada()">
+            <h5 class="fw-bolder mb-4 text-dark fs-4">Detalles de tu viaje</h5>
+
+            <div class="alert alert-info border-0 rounded-4 p-3 mb-3 small d-flex align-items-center gap-2" *ngIf="s.categoria === 'EXCURSION'">
+              <i class="bi bi-people-fill fs-5"></i>
+              <span>Plazas disponibles actuales: <strong class="fs-6">{{ s.cupoDisponible }}</strong></span>
+            </div>
+
+            <div class="alert alert-info border-0 rounded-4 p-3 mb-3 small" *ngIf="s.categoria === 'HOTEL'">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-door-open-fill fs-5"></i>
+                <span class="fw-bold">Habitaciones del Establecimiento:</span>
+              </div>
+              <ul class="m-0 ps-3 text-secondary">
+                <li *ngFor="let hab of s.habitaciones">
+                  {{ hab.tipo }}: <strong>{{ hab.cantidadTotal }}</strong> disp. (${{ hab.precioPorNoche }}/noche)
+                </li>
+              </ul>
+            </div>
+
+            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom border-light" *ngIf="s.categoria === 'HOTEL'">
+              <span class="text-secondary fw-medium">Estancia</span>
+              <span class="fw-bold text-dark fs-5">{{ noches() }} noches</span>
+            </div>
+
+            <div class="d-flex justify-content-between mb-4">
+              <span class="text-secondary fw-medium">
+                {{ s.categoria === 'HOTEL' ? 'Precio mínimo desde' : 'Precio base' }}
+              </span>
+              <span class="fw-bold text-dark fs-5">
+                ${{ s.categoria === 'HOTEL' ? obtenerPrecioMinimoHabitacion() : s.precioBase }}
+              </span>
+            </div>
+
+            <div class="rounded-4 p-4 mb-4 text-dark" style="background-color: #f8fdff; border: 1px solid #e1f5f9;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <p class="m-0 fw-bold fs-5 text-secondary">Estancia estimada</p>
+                  <p class="m-0 text-muted small">Tarifas según selección</p>
+                </div>
+                <p class="m-0 fw-bolder fs-2" style="color: #004e64;">
+                  ${{ s.categoria === 'HOTEL' ? (obtenerPrecioMinimoHabitacion() * noches()) : s.precioBase }}
+                </p>
+              </div>
+            </div>
+
+            <button (click)="irAConfirmar()"
+                    class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow-sm border-0 text-white"
+                    style="background-color: #ff6b35;">
+              {{ isLoggedIn() ? 'Reservar ahora' : 'Inicia sesión para reservar' }}
+            </button>
+          </div>
+
+          <div *ngIf="pasoConfirmacion() && !reservaConfirmada()">
+            <div class="d-flex align-items-center mb-4">
+              <button (click)="pasoConfirmacion.set(false)" class="btn btn-sm btn-light rounded-circle me-2">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+              <h5 class="fw-bolder m-0 text-dark fs-4">Personalizar</h5>
+            </div>
+
+            <form #reservaForm="ngForm">
+              <div class="mb-3">
+                <div *ngIf="s.categoria === 'HOTEL'">
+                  <label class="small fw-bold text-secondary mb-1">Fecha de Entrada</label>
+                  <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2 mb-2"
+                         name="fInicio" [(ngModel)]="fechaInicio" required #fInicio="ngModel">
+
+                  <label class="small fw-bold text-secondary mb-1">Fecha de Salida</label>
+                  <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2"
+                         name="fFin" [(ngModel)]="fechaFin" required #fFin="ngModel">
+
+                  <div *ngIf="(fInicio.touched || fFin.touched) && fInicio.value >= fFin.value" class="text-danger small mt-1">
+                    La fecha de salida debe ser posterior a la de entrada.
+                  </div>
+                </div>
+
+                <div *ngIf="s.categoria === 'EXCURSION'">
+                  <label class="small fw-bold text-secondary mb-1">Fecha Programada de la Actividad</label>
+                  <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2 mb-2"
+                         [ngModel]="s.fechaInicio" name="fExcursion" readonly disabled>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="small fw-bold text-secondary mb-1 d-flex justify-content-between align-items-center w-100">
+                  <span>¿Cuántas personas?</span>
+                  <span class="badge bg-warning text-dark" *ngIf="s.categoria === 'EXCURSION'">
+                    🔥 Quedan {{ s.cupoDisponible }} plazas
+                  </span>
+                </label>
+                <div class="d-flex align-items-center gap-3 bg-light p-2 rounded-4">
+                  <button type="button" (click)="cantidadPersonas = cantidadPersonas > 1 ? cantidadPersonas - 1 : 1" class="btn btn-sm btn-white shadow-sm rounded-circle border-0">-</button>
+                  <span class="flex-grow-1 text-center fw-bold">{{ cantidadPersonas }}</span>
+                  <button type="button" (click)="cantidadPersonas = cantidadPersonas + 1" class="btn btn-sm btn-white shadow-sm rounded-circle border-0">+</button>
+                </div>
+              </div>
+
+              <div class="mb-4" *ngIf="s.categoria === 'HOTEL'">
+                <div class="mb-3">
+                  <label class="small fw-bold text-secondary mb-1">Tipo de Alojamiento</label>
+                  <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada" required #tipoHab="ngModel">
+                    <option value="" disabled selected>Elige un tipo de habitación...</option>
+                    <option *ngFor="let hab of s.habitaciones" [value]="hab.tipo" [disabled]="hab.cantidadTotal <= 0">
+                      {{ hab.tipo }} - ${{ hab.precioPorNoche }}/noche
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="rounded-4 p-3 mb-4" style="background-color: #f8fdff; border: 1px solid #e1f5f9;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-secondary">Total final</span>
+                  <span class="fs-2 fw-bolder" style="color: #004e64;">${{ calcularPrecioDinamico() }}</span>
+                </div>
+              </div>
+
+              <button (click)="confirmarReservaFinal()"
+                      [disabled]="!isLoggedIn() || reservaForm.invalid || (s.categoria === 'HOTEL' && fechaInicio >= fechaFin)"
+                      class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow"
+                      [style.background-color]="(isLoggedIn() && reservaForm.valid && (s.categoria !== 'HOTEL' || fechaInicio < fechaFin)) ? '#004e64' : '#e9ecef'"
+                      [style.color]="(isLoggedIn() && reservaForm.valid && (s.categoria !== 'HOTEL' || fechaInicio < fechaFin)) ? 'white' : '#6c757d'"
+                      style="border: none;">
+                Ir a Pagar
+              </button>
+            </form>
+          </div>
+
+          <div *ngIf="reservaConfirmada()" class="p-4 rounded-4 text-center">
+            <span class="fs-1">🐢</span>
+            <h6 class="fw-bold mt-2" style="color: #00695c;">Reserva en proceso</h6>
+            <p class="small text-secondary mb-3">Redirigiendo a la pasarela de pago...</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

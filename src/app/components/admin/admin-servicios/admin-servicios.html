@@ -1,0 +1,250 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h2 class="fw-bolder text-dark mb-1">Inventario de Experiencias</h2>
+      <p class="text-secondary m-0">Añade o modifica los servicios disponibles en las islands.</p>
+    </div>
+    <a routerLink="/admin" class="btn btn-outline-secondary rounded-pill px-4 bg-white border-light shadow-sm">
+      <i class="bi bi-arrow-left"></i> Volver al Panel
+    </a>
+  </div>
+
+  <div class="card shadow-lg border-0 rounded-5 overflow-hidden mb-5">
+    <div class="p-1" style="background: linear-gradient(90deg, #00afca, #004e64);"></div>
+    <div class="card-body p-4 p-lg-5">
+      <h5 class="card-title mb-4 fw-bolder fs-4" style="color: #004e64;">
+        {{ editando ? '📝 Editar Servicio' : '🏝️ Nueva Experiencia' }}
+      </h5>
+
+      <form (ngSubmit)="guardarServicio()" class="row g-4">
+        <div class="col-md-4">
+          <label class="form-label small fw-bold text-secondary">Nombre del Servicio</label>
+          <input type="text" class="form-control rounded-3 border-light bg-light" [(ngModel)]="servicioActual.nombre" name="nombre" placeholder="Ej: Hotel Finch Bay" required>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label small fw-bold text-secondary">Categoría</label>
+          <select class="form-select rounded-3 border-light bg-light" [(ngModel)]="servicioActual.categoria" name="categoria">
+            <option value="HOTEL">🏨 HOTEL</option>
+            <option value="EXCURSION">🚤 EXCURSIÓN</option>
+          </select>
+        </div>
+
+        <div class="col-md-5">
+          <label class="form-label small fw-bold text-secondary">Ubicación (Isla/Sitio)</label>
+          <input type="text" class="form-control rounded-3 border-light bg-light" [(ngModel)]="servicioActual.ubicacion" name="ubicacion" placeholder="Ej: Isla Santa Cruz, Puerto Ayora">
+        </div>
+
+        <ng-container *ngIf="servicioActual.categoria === 'EXCURSION'">
+          <div class="col-md-3">
+            <label class="form-label small fw-bold text-secondary">Precio Base ($)</label>
+            <input type="number" class="form-control rounded-3 border-light bg-light" [(ngModel)]="servicioActual.precioBase" name="precioBase">
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small fw-bold text-secondary">Capacidad Máx. Personas</label>
+            <input type="number" class="form-control rounded-3 border-light bg-light" [(ngModel)]="servicioActual.capacidadMaxPersona" name="capacidad">
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small fw-bold text-secondary">Cupo Plazas Disponibles</label>
+            <input type="number" class="form-control rounded-3 border-light bg-light" [(ngModel)]="servicioActual.cupoDisponible" name="cupo">
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label small fw-bold text-dark"><i class="bi bi-calendar-event text-warning me-1"></i>Fecha de Excursión</label>
+            <input type="date" class="form-control rounded-3 border-warning bg-warning-subtle fw-bold" [(ngModel)]="servicioActual.fechaInicio" name="fechaInicio" required>
+          </div>
+        </ng-container>
+
+        <div class="row col-12 mt-3 g-3 align-items-center">
+          <div class="col-auto">
+            <div class="form-check form-switch custom-switch">
+              <input class="form-check-input" type="checkbox" id="destacadoCheck" [(ngModel)]="servicioActual.destacado" name="destacado">
+              <label class="form-check-label fw-bold text-dark" for="destacadoCheck">✨ Destacar</label>
+            </div>
+          </div>
+
+          <div class="col-auto" *ngIf="servicioActual.categoria === 'HOTEL'">
+            <div class="form-check form-switch custom-switch">
+              <input class="form-check-input" type="checkbox" id="wifiCheck" [(ngModel)]="servicioActual.tieneWifi" name="tieneWifi">
+              <label class="form-check-label fw-bold text-dark" for="wifiCheck">📶 Incluye Wifi</label>
+            </div>
+          </div>
+
+          <div class="col-auto" *ngIf="servicioActual.categoria === 'HOTEL'">
+            <div class="form-check form-switch custom-switch">
+              <input class="form-check-input" type="checkbox" id="desayunoCheck" [(ngModel)]="servicioActual.tieneDesayuno" name="tieneDesayuno">
+              <label class="form-check-label fw-bold text-dark" for="desayunoCheck">🥘 Incluye Desayuno</label>
+            </div>
+          </div>
+
+          <div class="col-auto" *ngIf="servicioActual.categoria === 'EXCURSION'">
+            <div class="form-check form-switch custom-switch">
+              <input class="form-check-input" type="checkbox" id="transporteCheck" [(ngModel)]="servicioActual.tieneTransporte" name="tieneTransporte">
+              <label class="form-check-label fw-bold text-dark" for="transporteCheck">🚤 Incluye Lancha</label>
+            </div>
+          </div>
+
+          <div class="col-auto" *ngIf="servicioActual.categoria === 'EXCURSION'">
+            <div class="form-check form-switch custom-switch">
+              <input class="form-check-input" type="checkbox" id="equipoCheck" [(ngModel)]="servicioActual.tieneEquipo" name="tieneEquipo">
+              <label class="form-check-label fw-bold text-dark" for="equipoCheck">🤿 Incluye Equipo</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mt-4">
+          <label class="form-label small fw-bold text-secondary">Descripción</label>
+          <textarea class="form-control rounded-3 border-light bg-light" [(ngModel)]="servicioActual.descripcion" name="descripcion" rows="3" placeholder="Describe la experiencia..."></textarea>
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label small fw-bold text-secondary">Imagen Descriptiva (Archivo o Base64)</label>
+          <input type="file" class="form-control rounded-3 border-light bg-light" (change)="onFileSelected($event)" accept="image/*">
+          <div class="mt-3 d-flex align-items-center gap-3" *ngIf="servicioActual.imagenUrl">
+            <img [src]="servicioActual.imagenUrl" width="150" class="rounded-4 border shadow-sm" alt="Preview" style="height: 100px; object-fit: cover;">
+            <span class="text-success small fw-bold">✓ Imagen lista</span>
+          </div>
+        </div>
+
+        <div class="col-12 mt-4" *ngIf="servicioActual.categoria === 'HOTEL'">
+          <div class="card border-0 rounded-4 p-4" style="background-color: #fcf8ff; border: 1px solid #f3e8ff !important;">
+            <h6 class="fw-bold mb-3" style="color: #4a148c;">
+              <i class="bi bi-door-open-fill me-2"></i>Configuración de Habitaciones y Precios por Noche
+            </h6>
+
+            <div class="row g-2 align-items-end mb-4">
+              <div class="col-md-4">
+                <label class="small fw-bold text-secondary mb-1">Tipo de Habitación</label>
+                <select class="form-select border-0 bg-white shadow-sm py-2" [(ngModel)]="nuevaHabitacionTipo" name="tempHabTipo">
+                  <option value="" disabled selected>Selecciona un tipo...</option>
+                  <option *ngFor="let tipo of tiposHabitacionDisponibles" [value]="tipo">{{ tipo }}</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="small fw-bold text-secondary mb-1">Precio / Noche ($)</label>
+                <input type="number" class="form-control border-0 bg-white shadow-sm py-2" [(ngModel)]="nuevaHabitacionPrecio" name="tempHabPrecio" min="0">
+              </div>
+              <div class="col-md-3">
+                <label class="small fw-bold text-secondary mb-1">Cantidad (Stock de Habitaciones)</label>
+                <input type="number" class="form-control border-0 bg-white shadow-sm py-2" [(ngModel)]="nuevaHabitacionCantidad" name="tempHabCant" min="1">
+              </div>
+              <div class="col-md-2">
+                <button class="btn fw-bold text-white w-100 py-2 shadow-sm" type="button" style="background-color: #8e24aa;" (click)="agregarHabitacion()">
+                  <i class="bi bi-plus-lg me-1"></i> Añadir
+                </button>
+              </div>
+            </div>
+
+            <ul class="list-group rounded-3 border-0 shadow-sm" *ngIf="servicioActual.habitaciones && servicioActual.habitaciones.length > 0">
+              <li class="list-group-item d-flex justify-content-between align-items-center border-light py-3"
+                  *ngFor="let hab of servicioActual.habitaciones; let i = index">
+                <div>
+                  <span class="badge bg-purple px-3 py-2 me-3" style="background-color: #f3e8ff; color: #7b1fa2; font-weight: bold;">{{ hab.tipo }}</span>
+                  <span class="text-dark me-4">Precio: <strong>${{ hab.precioPorNoche }}</strong> por noche</span>
+                  <span class="text-secondary small">Unidades en inventario: <strong>{{ hab.cantidadTotal }}</strong></span>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" (click)="eliminarHabitacion(i)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </li>
+            </ul>
+
+            <p class="text-muted small m-0 mt-1 italic" *ngIf="!servicioActual.habitaciones || servicioActual.habitaciones.length === 0">
+              <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Aún no has configurado habitaciones. Elige los datos arriba para habilitar reservas.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-12 mt-4">
+          <div class="card border-0 rounded-4 p-4" style="background-color: #f8fdff; border: 1px solid #e1f5f9 !important;">
+            <h6 class="fw-bold mb-3" style="color: #004e64;">
+              <i class="bi bi-gear-wide-connected me-2"></i>
+              {{ servicioActual.categoria === 'HOTEL' ? 'Políticas, Horarios y Normas del Alojamiento' : 'Línea de Tiempo / Hoja de Ruta de la Actividad' }}
+            </h6>
+
+            <div class="input-group mb-3 shadow-sm rounded-3 overflow-hidden">
+              <input type="text"
+                     class="form-control border-0 bg-white py-2"
+                     [placeholder]="servicioActual.categoria === 'HOTEL' ? 'Ej: Check-in a partir de las 14:00 PM o Mascotas no permitidas' : 'Ej: 08:00 AM - Charla inicial y abordaje en el muelle principal'"
+                     [(ngModel)]="nuevoDetalleTexto"
+                     name="tempDetalleInput">
+              <button class="btn fw-bold text-white px-4"
+                      type="button"
+                      style="background-color: #00afca;"
+                      (click)="agregarDetalle()">
+                <i class="bi bi-plus-lg me-1"></i> Añadir
+              </button>
+            </div>
+
+            <ul class="list-group rounded-3 border-0 shadow-sm" *ngIf="servicioActual.detallesDinamicos && servicioActual.detallesDinamicos.length > 0">
+              <li class="list-group-item d-flex justify-content-between align-items-center border-light"
+                  *ngFor="let detalle of servicioActual.detallesDinamicos; let i = index">
+                <span class="text-dark small"><i class="bi bi-arrow-right-short text-info fw-bold fs-5 me-1"></i>{{ detalle.detalleTexto }}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" (click)="eliminarDetalle(i)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </li>
+            </ul>
+
+            <p class="text-muted small m-0 mt-1 italic" *ngIf="!servicioActual.detallesDinamicos || servicioActual.detallesDinamicos.length === 0">
+              <i class="bi bi-info-circle me-1"></i>Aún no has agregado detalles. Escribe arriba y presiona "Añadir".
+            </p>
+          </div>
+        </div>
+
+        <div class="col-12 text-end pt-4 border-top">
+          <button type="button" class="btn btn-link text-decoration-none text-secondary me-3" (click)="resetForm()" *ngIf="editando">Descartar</button>
+          <button type="submit" class="btn px-5 py-2 rounded-pill fw-bold text-white shadow"
+                  [style.background-color]="editando ? '#004e64' : '#ff6b35'" style="border: none;">
+            {{ editando ? 'Guardar Cambios' : 'Publicar Ahora' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card shadow-lg border-0 rounded-5 overflow-hidden bg-white mb-5">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead style="background-color: #f8fdff;">
+        <tr>
+          <th class="ps-4 text-secondary small py-3">Vista</th>
+          <th class="text-secondary small py-3">Nombre</th>
+          <th class="text-secondary small py-3">Categoría</th>
+          <th class="text-secondary small py-3">Precio Base</th>
+          <th class="text-secondary small py-3">Ubicación</th>
+          <th class="text-center text-secondary small py-3 pe-4">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let s of servicios" class="border-bottom border-light">
+          <td class="ps-4 py-3">
+            <img [src]="s.imagenUrl" width="60" height="45" class="rounded-3 shadow-sm" style="object-fit: cover;">
+          </td>
+          <td>
+            <span class="fw-bold text-dark">{{ s.nombre }}</span>
+            <span *ngIf="s.destacado" class="ms-1 text-warning">★</span>
+          </td>
+          <td><span class="badge rounded-pill px-3 py-2 bg-light text-dark border">{{ s.categoria }}</span></td>
+          <td>
+            <span class="fw-bold" style="color: #004e64;">
+              {{ s.categoria === 'HOTEL' ? 'Por Habitación' : '$' + s.precioBase }}
+            </span>
+          </td>
+          <td class="small text-secondary">{{ s.ubicacion }}</td>
+          <td class="text-center pe-4">
+            <button class="btn btn-sm btn-light rounded-circle me-1" (click)="prepararEdicion(s)" title="Editar">
+              <i class="bi bi-pencil-square text-primary"></i>
+            </button>
+            <button class="btn btn-sm btn-light rounded-circle" (click)="eliminar(s.id)" title="Eliminar">
+              <i class="bi bi-trash3 text-danger"></i>
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

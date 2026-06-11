@@ -1,0 +1,27 @@
+/* Borra el max-height: 180px, no lo necesitas para este diseño de cuadrícula */
+
+.hover-up {
+  transition: transform 0.3s ease, shadow 0.3s ease;
+}
+
+.hover-up:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+/* Para que el texto de la descripción no rompa la tarjeta */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 3em; /* Mantiene el espacio aunque haya poco texto */
+}
+/* Ajuste de los botones de filtro para móviles */
+@media (max-width: 576px) {
+  .btn-outline-secondary,
+  .btn-dark {
+    padding: 0.4rem 0.8rem !important; /* Reducimos el padding interno */
+    font-size: 0.8rem !important;      /* Texto más pequeño */
+  }
+}

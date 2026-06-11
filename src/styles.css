@@ -1,0 +1,7 @@
+@import "flatpickr/dist/flatpickr.min.css";
+
+
+.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
+  background: #006ce4 !important;
+  border-color: #006ce4 !important;
+}

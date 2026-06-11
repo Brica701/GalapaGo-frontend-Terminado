@@ -1,0 +1,44 @@
+/* Estilos para los Badges de Estado del Admin */
+.status-pagada {
+  background-color: #d1f7ec;
+  color: #0f5132;
+  border: 1px solid #a7e9d7;
+}
+
+.status-confirmada {
+  background-color: #e1f5f9;
+  color: #055160;
+  border: 1px solid #b6effb;
+}
+
+.status-cancelada {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}
+
+/* Efectos de la tabla */
+.table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  border-bottom: none;
+}
+
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8fdff !important;
+}
+
+/* Botones suaves */
+.btn-success {
+  background-color: #20c997;
+  border: none;
+}
+
+.btn-success:hover {
+  background-color: #198754;
+}

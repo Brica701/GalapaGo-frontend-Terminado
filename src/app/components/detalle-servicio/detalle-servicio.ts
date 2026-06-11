@@ -1,0 +1,205 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { BusquedaService } from '../../services/busqueda.service';
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { ComentarioService } from '../../services/comentario';
+import { Comentario } from '../../models/comentario.model';
+import { ReservaService } from '../../services/reserva-service';
+
+@Component({
+  selector: 'app-detalle-servicio',
+  standalone: true,
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './detalle-servicio.html',
+  styleUrls: ['./detalle-servicio.css'],
+})
+export class DetalleServicioComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private http = inject(HttpClient);
+  busquedaService = inject(BusquedaService);
+  private comentarioService = inject(ComentarioService);
+  private reservaService = inject(ReservaService);
+
+  servicio = signal<any>(null);
+  pasoConfirmacion = signal(false);
+  reservaConfirmada = signal(false);
+  comentarios = signal<Comentario[]>([]);
+
+  cantidadPersonas: number = 1;
+  cantidadHabitaciones: number = 1;
+  tipoHabitacionSeleccionada: string = '';
+  textoComentario: string = '';
+  puntuacion: number = 5;
+
+  fechaInicio: string = '';
+  fechaFin: string = '';
+  
+  protected readonly Math = Math;
+
+  noches = this.busquedaService.noches;
+  isLoggedIn = this.busquedaService.usuarioLogueado;
+
+  ngOnInit() {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    const encontrado = this.busquedaService.servicios().find((s) => s.id === id);
+
+    if (encontrado) {
+      this.servicio.set(encontrado);
+    } else {
+      this.cargarDatosFrescos(id);
+    }
+
+    this.cargarComentarios();
+  }
+
+  cargarDatosFrescos(id: number) {
+    this.http.get(`http://localhost:8080/api/servicios/${id}`).subscribe({
+      next: (data: any) => this.servicio.set(data),
+      error: () => this.router.navigate(['/']),
+    });
+  }
+
+  confirmarReservaFinal() {
+    const usuarioActual = this.busquedaService.datosUsuario();
+    const servicioActual = this.servicio();
+    if (!usuarioActual?.id) return;
+
+    const estadoPrevio = JSON.parse(JSON.stringify(servicioActual));
+
+    const nuevoServicio = { ...servicioActual };
+    if (nuevoServicio.categoria === 'EXCURSION') {
+      nuevoServicio.cupoDisponible -= this.cantidadPersonas;
+    } else if (nuevoServicio.categoria === 'HOTEL') {
+      const hab = nuevoServicio.habitaciones.find(
+        (h: any) => h.tipo === this.tipoHabitacionSeleccionada,
+      );
+      if (hab) hab.cantidadTotal -= this.cantidadHabitaciones;
+    }
+
+    this.servicio.set(nuevoServicio);
+
+    const totalPersonas =
+      servicioActual.categoria === 'HOTEL'
+        ? this.cantidadPersonas * this.cantidadHabitaciones
+        : this.cantidadPersonas;
+
+    const reservaData = {
+      usuario: { id: usuarioActual.id },
+      servicio: { id: servicioActual.id },
+      habitacion:
+        servicioActual.categoria === 'HOTEL' ? { id: this.getHabitacionActual()?.id } : null,
+      fechaInicio: this.fechaInicio,
+      fechaFin: servicioActual.categoria === 'HOTEL' ? this.fechaFin : this.fechaInicio,
+      cantidadPersonas: totalPersonas,
+      cantidadHabitaciones: servicioActual.categoria === 'HOTEL' ? this.cantidadHabitaciones : 0,
+      tipoHabitacion: servicioActual.categoria === 'HOTEL' ? this.tipoHabitacionSeleccionada : null,
+      estado: 'PENDIENTE',
+    };
+
+    this.reservaService.guardar(reservaData).subscribe({
+      next: (reservaCreada: any) => {
+        this.busquedaService.actualizarServicioLocal(nuevoServicio);
+
+        this.router.navigate(['/pago', reservaCreada.id], {
+          state: { precio: this.calcularPrecioDinamico() },
+        });
+      },
+      error: (err) => {
+
+        this.servicio.set(estadoPrevio);
+        alert(`❌ Error al procesar: ${err.error?.message || 'Inténtalo de nuevo'}`);
+      },
+    });
+  }
+  isAdmin(): boolean {
+    return (
+      this.busquedaService.datosUsuario()?.rol === 'ADMIN' ||
+      this.busquedaService.datosUsuario()?.role === 'ADMIN'
+    );
+  }
+
+  eliminarComentario(id: number) {
+    if (confirm('¿Eliminar?'))
+      this.comentarioService.eliminar(id).subscribe(() => this.cargarComentarios());
+  }
+
+  cargarComentarios() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id)
+      this.comentarioService
+        .listarPorServicio(Number(id))
+        .subscribe((d) => this.comentarios.set(d));
+  }
+
+  calcularPromedio(): number {
+    const lista = this.comentarios();
+    return lista.length === 0
+      ? 0
+      : Number((lista.reduce((a, b) => a + b.puntuacion, 0) / lista.length).toFixed(1));
+  }
+
+  enviarComentario() {
+    const u = this.busquedaService.datosUsuario();
+    if (!u?.id) return;
+    this.comentarioService
+      .publicar({
+        usuario: { id: u.id },
+        servicio: { id: this.servicio()?.id },
+        puntuacion: this.puntuacion,
+        texto: this.textoComentario,
+      })
+      .subscribe(() => {
+        this.textoComentario = '';
+        this.cargarComentarios();
+      });
+  }
+
+  irAConfirmar() {
+    if (this.isLoggedIn()) this.pasoConfirmacion.set(true);
+    else this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+  }
+
+  obtenerPrecioMinimoHabitacion(): number {
+    const s = this.servicio();
+    if (!s) return 0;
+    return s.categoria === 'HOTEL' && s.habitaciones?.length > 0
+      ? Math.min(...s.habitaciones.map((h: any) => h.precioPorNoche))
+      : s.precioBase;
+  }
+
+  getHabitacionActual(): any {
+    const s = this.servicio();
+    return s?.habitaciones?.find((h: any) => h.tipo === this.tipoHabitacionSeleccionada);
+  }
+
+  getOpcionesHabitaciones(): number[] {
+    const hab = this.getHabitacionActual();
+    return hab
+      ? Array.from({ length: Math.min(hab.cantidadTotal, 4) }, (_, i) => i + 1)
+      : [1, 2, 3, 4];
+  }
+
+  calcularNochesLocales(): number {
+    if (!this.fechaInicio || !this.fechaFin) return 1;
+    const d = (new Date(this.fechaFin).getTime() - new Date(this.fechaInicio).getTime()) / 86400000;
+    return d > 0 ? d : 1;
+  }
+
+  calcularPrecioDinamico(): number {
+    const s = this.servicio();
+    if (!s) return 0;
+    if (s.categoria === 'HOTEL') {
+      const h = this.getHabitacionActual();
+      return (
+        (h ? h.precioPorNoche : this.obtenerPrecioMinimoHabitacion()) *
+        this.cantidadHabitaciones *
+        this.calcularNochesLocales()
+      );
+    }
+    return s.precioBase * this.cantidadPersonas;
+  }
+}

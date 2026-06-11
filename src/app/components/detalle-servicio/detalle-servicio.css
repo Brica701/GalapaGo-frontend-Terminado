@@ -1,0 +1,57 @@
+.sticky-panel {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 2rem;
+  z-index: 10;
+}
+
+.timeline-container {
+  position: relative;
+  padding-left: 10px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 30px;
+  padding-bottom: 30px;
+  border-left: 2px solid #00afca;
+}
+
+.timeline-item.last {
+  border-left: 2px solid transparent !important;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  background-color: #00afca;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(0, 175, 202, 0.2);
+  z-index: 5;
+  transition: transform 0.2s ease;
+}
+
+.timeline-item:hover .timeline-dot {
+  transform: scale(1.3);
+}
+
+.timeline-content {
+  position: relative;
+  top: -4px;
+}
+
+.card {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+
+

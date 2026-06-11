@@ -1,0 +1,49 @@
+<header class="py-3 sticky-top backdrop-glass shadow-sm">
+  <div class="container d-flex justify-content-between align-items-center">
+    <a routerLink="/" class="text-decoration-none d-flex align-items-center gap-2">
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="GalapaGo Logo">
+      </div>
+      <h1 class="m-0 fs-3 fw-bold text-white">Galapa<span style="color: #00afca;">Go</span></h1>
+    </a>
+
+    <div class="d-flex align-items-center">
+      @if (usuario) {
+        <div class="user-menu-container">
+          <a routerLink="/mis-reservas" class="user-nav-link">Mis Reservas</a>
+          <span class="user-info-text">{{ usuario.nombre }}</span>
+          <button (click)="cerrarSesion()" class="btn btn-sm btn-outline-light ms-1 px-3" style="border-radius: 20px;">Salir</button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="btn btn-outline-light px-4 fw-bold" style="border-radius: 20px;">Entrar</a>
+      }
+    </div>
+  </div>
+</header>
+
+@if (router.url === '/') {
+  <section class="hero-section py-5"
+           [style.backgroundImage]="'url(images/fondo.jpg)'"
+           style="background-size: cover; background-position: center; background-repeat: no-repeat; position: relative;">
+
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 78, 100, 0.7); z-index: 1;"></div>
+
+    <div class="container text-center py-5" style="position: relative; z-index: 2;">
+      <h2 class="display-4 fw-bold text-white mb-3">Descubre Galápagos</h2>
+      <p class="text-white fs-5 mb-5 opacity-75">Tu próxima aventura empieza aquí</p>
+
+      <div class="search-container mx-auto">
+        <input type="text"
+               class="form-control form-control-lg border-0 bg-transparent text-white shadow-none"
+               placeholder="¿Qué lugar te gustaría explorar?"
+               (input)="onSearchChange($event)">
+      </div>
+    </div>
+  </section>
+}
+
+<main class="container my-5" style="min-height: 60vh;">
+  <router-outlet></router-outlet>
+</main>
+
+<app-footer></app-footer>

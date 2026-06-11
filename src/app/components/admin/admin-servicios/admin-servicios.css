@@ -1,0 +1,22 @@
+/* Estilo para los inputs del Admin */
+.form-control:focus, .form-select:focus {
+  background-color: #fff;
+  border-color: #00afca;
+  box-shadow: 0 0 0 0.25rem rgba(0, 175, 202, 0.25);
+}
+
+/* Switch personalizado */
+.custom-switch .form-check-input:checked {
+  background-color: #ff6b35;
+  border-color: #ff6b35;
+}
+
+/* Ajustes de tabla */
+.table th {
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.table tbody tr:hover {
+  background-color: #f8fdff !important;
+}

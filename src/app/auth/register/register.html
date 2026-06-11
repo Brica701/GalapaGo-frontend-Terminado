@@ -1,0 +1,59 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%; border-radius: 20px;">
+    <div class="card-body p-5">
+      <h2 class="fw-bold mb-2 text-dark">Crea una cuenta</h2>
+      <p class="text-muted mb-4 small">Regístrate para explorar Galápagos.</p>
+
+      <div *ngIf="mensajeError" class="alert alert-danger small py-2">
+        {{ mensajeError }}
+      </div>
+
+      <form #regForm="ngForm" (ngSubmit)="onRegister()">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Nombre</label>
+            <input type="text" class="form-control" [(ngModel)]="nuevoUsuario.nombre" name="nombre"
+                   required minlength="2" #nombre="ngModel"
+                   [class.is-invalid]="nombre.invalid && (nombre.dirty || nombre.touched)">
+            <div class="invalid-feedback" *ngIf="nombre.errors?.['required']">Obligatorio</div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label small fw-bold">Apellidos</label>
+            <input type="text" class="form-control" [(ngModel)]="nuevoUsuario.apellidos" name="apellidos"
+                   required minlength="2" #apellidos="ngModel"
+                   [class.is-invalid]="apellidos.invalid && (apellidos.dirty || apellidos.touched)">
+            <div class="invalid-feedback" *ngIf="apellidos.errors?.['required']">Obligatorio</div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Correo electrónico</label>
+          <input type="email" class="form-control" [(ngModel)]="nuevoUsuario.email" name="email"
+                 placeholder="tu@email.com" required email #email="ngModel"
+                 [class.is-invalid]="email.invalid && (email.dirty || email.touched)">
+          <div class="invalid-feedback" *ngIf="email.invalid">Formato de email inválido</div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small fw-bold">Contraseña</label>
+          <input type="password" class="form-control" [(ngModel)]="nuevoUsuario.password" name="password"
+                 placeholder="Mínimo 6 caracteres" required minlength="6" #password="ngModel"
+                 [class.is-invalid]="password.invalid && (password.dirty || password.touched)">
+          <div class="invalid-feedback" *ngIf="password.errors?.['minlength']">Mínimo 6 caracteres</div>
+        </div>
+
+        <button type="submit" [disabled]="regForm.invalid" class="btn w-100 fw-bold py-2 rounded-pill text-white"
+                style="background-color: #ff6b35; border: none;">
+          Crear cuenta
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <span class="text-muted small">¿Ya tienes cuenta?</span>
+        <a routerLink="/login" class="text-decoration-none small fw-bold ms-1" style="color: #00afca;">
+          Inicia sesión aquí
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

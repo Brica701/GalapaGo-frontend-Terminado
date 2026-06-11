@@ -1,0 +1,12 @@
+.card {
+  transition: transform 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #005ea6 !important;
+  transform: scale(1.02);
+}
+
+.min-vh-100 {
+  background-color: #f8f9fa;
+}

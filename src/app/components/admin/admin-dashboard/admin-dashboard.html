@@ -1,0 +1,143 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-end mb-5">
+    <div>
+      <h2 class="fw-bolder text-dark mb-1">Centro de Control</h2>
+      <p class="text-secondary m-0">Gestionando la aventura en <span class="fw-bold" style="color: #00afca;">GalapaGo</span></p>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a routerLink="/admin/servicios" class="btn btn-dark rounded-pill px-4 shadow-sm border-0">
+        <i class="bi bi-houses-fill me-2"></i> Servicios
+      </a>
+      <a routerLink="/" class="btn btn-outline-secondary rounded-pill px-4 bg-white shadow-sm border-light">
+        <i class="bi bi-eye me-2"></i> Vista Web
+      </a>
+      <button (click)="logout()" class="btn btn-outline-danger rounded-pill px-3 shadow-sm border-light bg-white">
+        <i class="bi bi-box-arrow-right"></i> Salir
+      </button>
+      <span class="badge rounded-pill d-flex align-items-center px-3" style="background-color: #004e64;">
+        <span class="spinner-grow spinner-grow-sm me-2 text-info"></span> Admin
+      </span>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5" *ngIf="stats">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-lg h-100 rounded-5 overflow-hidden">
+        <div class="p-1" style="background-color: #00afca;"></div>
+        <div class="card-body p-4">
+          <p class="text-uppercase text-secondary small fw-bolder mb-2" style="letter-spacing: 1px;">Ingresos Totales Brutos</p>
+          <h2 class="display-5 fw-bolder" style="color: #004e64;">{{ stats.totalIngresos | currency:'USD' }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-0 shadow-lg h-100 rounded-5 overflow-hidden">
+        <div class="p-1" style="background-color: #ff6b35;"></div>
+        <div class="card-body p-4">
+          <p class="text-uppercase text-secondary small fw-bolder mb-2" style="letter-spacing: 1px;">Total Reservas Procesadas</p>
+          <h2 class="display-5 fw-bolder text-dark">{{ stats.totalReservas }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-lg border-0 rounded-5 overflow-hidden bg-white mb-5">
+    <div class="card-header bg-white py-4 px-4 border-0">
+      <h4 class="mb-0 fw-bolder text-dark">Últimas Actividades</h4>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+          <tr>
+            <th class="ps-4 text-secondary py-3">Referencia</th>
+            <th class="text-secondary py-3">Explorador</th>
+            <th class="text-secondary py-3">Experiencia y Fechas</th>
+            <th class="text-secondary py-3">Inversión</th>
+            <th class="text-secondary py-3">Estado</th>
+            <th class="text-center text-secondary py-3">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngIf="reservas.length === 0">
+            <td colspan="6" class="text-center py-5 text-muted">
+              <i class="bi bi-info-circle fs-4 d-block mb-2"></i> No se registran movimientos o reservas vigentes en el sistema.
+            </td>
+          </tr>
+
+          <tr *ngFor="let reserva of reservas" class="border-bottom border-light">
+            <td class="ps-4 py-4">
+              <span class="badge bg-light text-dark border fw-bold">#{{ reserva.id }}</span>
+            </td>
+            <td>
+              <div class="d-flex flex-column">
+                <span class="fw-bold text-dark">{{ reserva.usuario?.nombre || 'Usuario Web' }}</span>
+                <small class="text-secondary">{{ reserva.usuario?.email }}</small>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex flex-column">
+                <div class="fw-medium text-dark">
+                  <span class="badge rounded-pill bg-light text-dark border small me-1">{{ reserva.servicio?.categoria }}</span>
+                  {{ reserva.servicio?.nombre }}
+                </div>
+
+                <div class="mt-1">
+                  <small class="text-primary fw-semibold" *ngIf="reserva.servicio?.categoria === 'HOTEL'">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    {{ reserva.fechaInicio | date:'dd/MM/yyyy' }} al {{ reserva.fechaFin | date:'dd/MM/yyyy' }}
+                  </small>
+
+                  <span class="badge bg-warning text-dark rounded-pill fw-bold px-2.5 py-1 small" *ngIf="reserva.servicio?.categoria === 'EXCURSION'">
+                    <i class="bi bi-calendar-event-fill me-1"></i> Día del evento: {{ reserva.fechaInicio | date:'dd/MM/yyyy' }}
+                  </span>
+                </div>
+
+                <small class="text-muted mt-1" *ngIf="reserva.servicio?.categoria === 'EXCURSION'">
+                  <i class="bi bi-people-fill me-1"></i> {{ reserva.cantidadPersonas }} plazas reservadas
+                </small>
+
+                <small class="text-muted mt-1" *ngIf="reserva.servicio?.categoria === 'HOTEL'">
+                  <i class="bi bi-door-open-fill me-1"></i>
+                  Tarifa: <strong class="text-dark">{{ reserva.habitacion?.tipo || reserva.tipoHabitacion }}</strong>
+                  ({{ reserva.cantidadHabitaciones }} {{ reserva.cantidadHabitaciones === 1 ? 'hab.' : 'habs.' }})
+                </small>
+              </div>
+            </td>
+            <td>
+              <span class="fw-bolder text-dark">{{ reserva.precioTotal | currency:'USD' }}</span>
+            </td>
+            <td>
+                <span class="badge rounded-pill px-3 py-2 border fw-semibold"
+                      [ngClass]="{
+                        'bg-success-subtle text-success border-success-subtle': reserva.estado === 'PAGADA',
+                        'bg-info-subtle text-info border-info-subtle': reserva.estado === 'CONFIRMADA',
+                        'bg-danger-subtle text-danger border-danger-subtle': reserva.estado === 'CANCELADA'
+                      }">
+                  {{ reserva.estado || 'CONFIRMADA' }}
+                </span>
+            </td>
+            <td class="text-center pe-4">
+              <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold"
+                        *ngIf="reserva.estado === 'CONFIRMADA'"
+                        (click)="marcarComoPagada(reserva.id)"
+                        title="Registrar pago">
+                  <i class="bi bi-check2-circle"></i> Pago
+                </button>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold"
+                        *ngIf="reserva.estado !== 'CANCELADA'"
+                        (click)="cancelarReserva(reserva.id)"
+                        title="Anular reserva">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
