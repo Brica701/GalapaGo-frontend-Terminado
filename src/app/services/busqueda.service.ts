@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class BusquedaService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/servicios';
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/servicios';
 
   cargando = signal<boolean>(true);
 
@@ -42,9 +42,8 @@ export class BusquedaService {
     });
   }
 
-
   liberarCupos(reserva: any) {
-    const servicio = this.servicios().find(s => s.id === reserva.servicio.id);
+    const servicio = this.servicios().find((s) => s.id === reserva.servicio.id);
 
     if (servicio) {
       const actualizado = { ...servicio };

@@ -7,7 +7,7 @@ import { Observable, of } from 'rxjs';
 })
 export class ReservaService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/reservas';
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/reservas';
 
   obtenerMisReservas(): Observable<any[]> {
     const usuarioGuardado = localStorage.getItem('usuarioLogueado');
@@ -29,7 +29,6 @@ export class ReservaService {
   }
 
   confirmarReserva(id: number): Observable<any> {
-
     return this.http.put(`${this.apiUrl}/${id}/confirmar`, {});
   }
 }

@@ -5,8 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class AdminServiciosService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/servicios';
-
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/servicios';
 
   listarTodo(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}?size=100`);

@@ -8,19 +8,18 @@ import { Router, RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, HttpClientModule, RouterLink],
   templateUrl: './admin-dashboard.html',
-  styleUrl: './admin-dashboard.css'
+  styleUrl: './admin-dashboard.css',
 })
 export class AdminDashboardComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
-  private apiUrl = 'http://localhost:8080/api/reservas';
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/reservas';
 
   reservas: any[] = [];
   stats: any = null;
 
   ngOnInit(): void {
-
     const usuarioString = localStorage.getItem('usuarioLogueado');
     const usuario = usuarioString ? JSON.parse(usuarioString) : null;
 
@@ -38,7 +37,7 @@ export class AdminDashboardComponent implements OnInit {
         this.reservas = data;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error cargando reservas', err)
+      error: (err) => console.error('Error cargando reservas', err),
     });
 
     this.http.get<any>(`${this.apiUrl}/dashboard/stats`).subscribe({
@@ -46,23 +45,21 @@ export class AdminDashboardComponent implements OnInit {
         this.stats = data;
         this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error cargando estadísticas', err)
+      error: (err) => console.error('Error cargando estadísticas', err),
     });
   }
 
   marcarComoPagada(id: number) {
-
-    this.http.patch(`${this.apiUrl}/${id}/estado`, { estado: 'PAGADA' })
-      .subscribe({
-        next: () => {
-          alert('Reserva actualizada a PAGADA');
-          this.cargarDatos();
-        },
-        error: (err) => {
-          console.error('Error al actualizar estado', err);
-          alert('No se pudo actualizar el estado de la reserva.');
-        }
-      });
+    this.http.patch(`${this.apiUrl}/${id}/estado`, { estado: 'PAGADA' }).subscribe({
+      next: () => {
+        alert('Reserva actualizada a PAGADA');
+        this.cargarDatos();
+      },
+      error: (err) => {
+        console.error('Error al actualizar estado', err);
+        alert('No se pudo actualizar el estado de la reserva.');
+      },
+    });
   }
 
   cancelarReserva(id: number) {
@@ -71,7 +68,7 @@ export class AdminDashboardComponent implements OnInit {
         next: () => {
           this.cargarDatos();
         },
-        error: (err) => console.error('Error al eliminar/cancelar la reserva', err)
+        error: (err) => console.error('Error al eliminar/cancelar la reserva', err),
       });
     }
   }

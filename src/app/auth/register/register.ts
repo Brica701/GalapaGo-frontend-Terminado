@@ -25,7 +25,8 @@ export class RegisterComponent {
   constructor(private http: HttpClient, private router: Router) {}
 
   onRegister() {
-    this.http.post('http://localhost:8080/api/auth/register', this.nuevoUsuario)
+    this.http
+      .post('https://galapago-backend-terminado.onrender.com/api/auth/register', this.nuevoUsuario)
       .subscribe({
         next: (res) => {
           alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
@@ -33,7 +34,7 @@ export class RegisterComponent {
         },
         error: (err) => {
           this.mensajeError = err.error?.error || 'Error al conectar con el servidor';
-        }
+        },
       });
   }
 }

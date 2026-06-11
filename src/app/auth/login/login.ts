@@ -32,25 +32,26 @@ export class LoginComponent implements OnInit {
   acceder() {
     const credenciales = { email: this.email, password: this.password };
 
-    this.http.post('http://localhost:8080/api/auth/login', credenciales).subscribe({
-      next: (usuarioDB: any) => {
-        console.log('Login exitoso:', usuarioDB);
+    this.http
+      .post('https://galapago-backend-terminado.onrender.com/api/auth/login', credenciales)
+      .subscribe({
+        next: (usuarioDB: any) => {
+          console.log('Login exitoso:', usuarioDB);
 
-        localStorage.setItem('usuarioLogueado', JSON.stringify(usuarioDB));
+          localStorage.setItem('usuarioLogueado', JSON.stringify(usuarioDB));
 
-        if (usuarioDB.rol === 'ADMIN') {
-          window.location.href = '/admin/dashboard';
-        } else {
-          this.router.navigateByUrl(this.returnUrl).then(() => {
-
-            window.location.reload();
-          });
-        }
-      },
-      error: (err) => {
-        console.error('Error en login:', err);
-        this.errorMsg = err.error?.error || 'Correo o contraseña incorrectos';
-      },
-    });
+          if (usuarioDB.rol === 'ADMIN') {
+            window.location.href = '/admin/dashboard';
+          } else {
+            this.router.navigateByUrl(this.returnUrl).then(() => {
+              window.location.reload();
+            });
+          }
+        },
+        error: (err) => {
+          console.error('Error en login:', err);
+          this.errorMsg = err.error?.error || 'Correo o contraseña incorrectos';
+        },
+      });
   }
 }

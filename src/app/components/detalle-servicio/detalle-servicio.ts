@@ -36,7 +36,7 @@ export class DetalleServicioComponent implements OnInit {
 
   fechaInicio: string = '';
   fechaFin: string = '';
-  
+
   protected readonly Math = Math;
 
   noches = this.busquedaService.noches;
@@ -57,7 +57,7 @@ export class DetalleServicioComponent implements OnInit {
   }
 
   cargarDatosFrescos(id: number) {
-    this.http.get(`http://localhost:8080/api/servicios/${id}`).subscribe({
+    this.http.get(`https://galapago-backend-terminado.onrender.com/api/servicios/${id}`).subscribe({
       next: (data: any) => this.servicio.set(data),
       error: () => this.router.navigate(['/']),
     });

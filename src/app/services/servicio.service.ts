@@ -4,14 +4,12 @@ import { Observable } from 'rxjs';
 import { Servicio } from '../models/servicio.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ServicioService {
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/servicios';
 
-  private apiUrl = 'http://localhost:8080/api/servicios';
-
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getServicios(): Observable<Servicio[]> {
     return this.http.get<Servicio[]>(this.apiUrl);

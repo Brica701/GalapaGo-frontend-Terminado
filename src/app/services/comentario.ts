@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class ComentarioService {
-  private apiUrl = 'http://localhost:8080/api/comentarios';
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/comentarios';
 
   constructor(private http: HttpClient) {}
 
