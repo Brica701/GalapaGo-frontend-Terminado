@@ -74,21 +74,21 @@
 
           <div class="col-auto" *ngIf="servicioActual.categoria === 'HOTEL'">
             <div class="form-check form-switch custom-switch">
-              <input class="form-check-input" type="checkbox" id="desayunoCheck" [(ngModel)]="servicioActual.tieneDesayuno" name="tieneDesayuno">
+              <input class="form-check-input" type="checkbox" id="desayunoCheck" [(ngModel)]="servicioActual.tieneDesayuno" name="desayunoCheck">
               <label class="form-check-label fw-bold text-dark" for="desayunoCheck">🥘 Incluye Desayuno</label>
             </div>
           </div>
 
           <div class="col-auto" *ngIf="servicioActual.categoria === 'EXCURSION'">
             <div class="form-check form-switch custom-switch">
-              <input class="form-check-input" type="checkbox" id="transporteCheck" [(ngModel)]="servicioActual.tieneTransporte" name="tieneTransporte">
+              <input class="form-check-input" type="checkbox" id="transporteCheck" [(ngModel)]="servicioActual.tieneTransporte" name="transporte">
               <label class="form-check-label fw-bold text-dark" for="transporteCheck">🚤 Incluye Lancha</label>
             </div>
           </div>
 
           <div class="col-auto" *ngIf="servicioActual.categoria === 'EXCURSION'">
             <div class="form-check form-switch custom-switch">
-              <input class="form-check-input" type="checkbox" id="equipoCheck" [(ngModel)]="servicioActual.tieneEquipo" name="tieneEquipo">
+              <input class="form-check-input" type="checkbox" id="equipoCheck" [(ngModel)]="servicioActual.tieneEquipo" name="equipo">
               <label class="form-check-label fw-bold text-dark" for="equipoCheck">🤿 Incluye Equipo</label>
             </div>
           </div>
@@ -151,9 +151,11 @@
               </li>
             </ul>
 
-            <p class="text-muted small m-0 mt-1 italic" *ngIf="!servicioActual.habitaciones || servicioActual.habitaciones.length === 0">
-              <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>Aún no has configurado habitaciones. Elige los datos arriba para habilitar reservas.
-            </p>
+            <!-- Alerta Bootstrap sustituida -->
+            <div class="alert alert-warning border-0 rounded-3 mt-3 d-flex align-items-center" role="alert" *ngIf="!servicioActual.habitaciones || servicioActual.habitaciones.length === 0">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <div class="small fw-bold">Aún no has configurado habitaciones. Elige los datos arriba para habilitar reservas.</div>
+            </div>
           </div>
         </div>
 
@@ -188,9 +190,11 @@
               </li>
             </ul>
 
-            <p class="text-muted small m-0 mt-1 italic" *ngIf="!servicioActual.detallesDinamicos || servicioActual.detallesDinamicos.length === 0">
-              <i class="bi bi-info-circle me-1"></i>Aún no has agregado detalles. Escribe arriba y presiona "Añadir".
-            </p>
+            <!-- Alerta Bootstrap sustituida -->
+            <div class="alert alert-info border-0 rounded-3 mt-3 d-flex align-items-center" role="alert" *ngIf="!servicioActual.detallesDinamicos || servicioActual.detallesDinamicos.length === 0">
+              <i class="bi bi-info-circle-fill me-2"></i>
+              <div class="small fw-bold">Aún no has agregado detalles. Escribe arriba y presiona "Añadir".</div>
+            </div>
           </div>
         </div>
 
