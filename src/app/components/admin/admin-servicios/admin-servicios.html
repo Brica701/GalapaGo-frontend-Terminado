@@ -4,9 +4,11 @@
       <h2 class="fw-bolder text-dark mb-1">Inventario de Experiencias</h2>
       <p class="text-secondary m-0">Añade o modifica los servicios disponibles en las islands.</p>
     </div>
-    <a routerLink="/admin" class="btn btn-outline-secondary rounded-pill px-4 bg-white border-light shadow-sm">
+    <button type="button"
+            (click)="volverAlPanel()"
+            class="btn btn-outline-secondary rounded-pill px-4 bg-white border-light shadow-sm">
       <i class="bi bi-arrow-left"></i> Volver al Panel
-    </a>
+    </button>
   </div>
 
   <div class="card shadow-lg border-0 rounded-5 overflow-hidden mb-5">

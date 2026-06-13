@@ -1,54 +1,28 @@
-import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReservaService {
-  // "Caja" que mantiene la lista de reservas siempre actualizada
-  private reservasSubject = new BehaviorSubject<any[]>(this.leerLocal());
-  reservas$ = this.reservasSubject.asObservable();
+  private http = inject(HttpClient);
+  private apiUrl = 'https://galapago-backend-terminado.onrender.com/api/reservas';
 
-  private leerLocal(): any[] {
-    return JSON.parse(localStorage.getItem('mis_reservas') || '[]');
-  }
 
-  private guardarLocal(reservas: any[]): void {
-    localStorage.setItem('mis_reservas', JSON.stringify(reservas));
-    this.reservasSubject.next(reservas); // Esto hace que todos los componentes se refresquen
-  }
-
-  obtenerMisReservas(): Observable<any[]> {
-    const usuarioGuardado = localStorage.getItem('usuarioLogueado');
-    if (!usuarioGuardado) return of([]);
-
-    const usuario = JSON.parse(usuarioGuardado);
-    const todas = this.leerLocal();
-    return of(todas.filter((r) => r.usuarioId === usuario.id));
-  }
-
-  eliminarReserva(id: number): Observable<any> {
-    const nuevas = this.leerLocal().filter((r) => r.id !== id);
-    this.guardarLocal(nuevas);
-    return of({ success: true });
+  obtenerMisReservas(usuarioId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/usuario/${usuarioId}`);
   }
 
   guardar(reserva: any): Observable<any> {
-    const reservas = this.leerLocal();
-    const nueva = { ...reserva, id: Date.now() };
-    reservas.push(nueva);
-    this.guardarLocal(reservas);
-    return of(nueva);
+    return this.http.post<any>(this.apiUrl, reserva);
+  }
+
+  eliminarReserva(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   confirmarReserva(id: number): Observable<any> {
-    const reservas = this.leerLocal();
-    const index = reservas.findIndex((r) => r.id === id);
-    if (index !== -1) {
-      reservas[index].confirmada = true;
-      this.guardarLocal(reservas);
-    }
-    return of(reservas[index]);
+    return this.http.put<any>(`${this.apiUrl}/${id}/confirmar`, {});
   }
 }

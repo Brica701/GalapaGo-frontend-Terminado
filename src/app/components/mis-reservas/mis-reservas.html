@@ -1,60 +1,68 @@
 <div class="row g-4 justify-content-center">
-  @for (reserva of misReservas(); track reserva.id) {
-    <div class="col-md-6 col-lg-4">
-      <div class="card bg-secondary text-white border-0 shadow-lg p-4 rounded-4 h-100">
+  @if (misReservas().length === 0) {
+    <div class="col-12 text-center py-5">
+      <h3 class="text-secondary">No tienes reservas registradas.</h3>
+      <p>Explora nuestras experiencias en GalapaGo.</p>
+    </div>
+  } @else {
+    @for (reserva of misReservas(); track reserva.id) {
+      <div class="col-md-6 col-lg-4">
+        <div class="card bg-dark text-white border-0 shadow-lg p-4 rounded-4 h-100">
 
-        <h5 class="fw-bold text-info mb-3 border-bottom border-info pb-2">
-          {{ reserva.servicio?.nombre || 'Reserva' }}
-        </h5>
+          <h5 class="fw-bold text-info mb-3 border-bottom border-info pb-2">
+            {{ reserva.servicio?.nombre ?? 'Experiencia Galápagos' }}
+          </h5>
 
-        <div class="d-flex flex-column gap-3 mb-4">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-calendar-event text-info me-2 fs-5"></i>
-            <div>
-              <strong class="d-block text-info">
-                {{ reserva.servicio?.categoria?.toUpperCase() === 'HOTEL' ? 'Estancia:' : 'Fecha actividad:' }}
-              </strong>
-              <span>
-                @if (reserva.servicio?.categoria?.toUpperCase() === 'HOTEL') {
-                  {{ reserva.fechaInicio | date:'dd/MM/yyyy' }} a {{ reserva.fechaFin | date:'dd/MM/yyyy' }}
-                } @else {
-                  {{ (reserva.fechaInicio || reserva.servicio?.fechaInicio) | date:'dd/MM/yyyy' }}
-                }
-              </span>
+          <div class="d-flex flex-column gap-3 mb-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-calendar-event text-info me-2 fs-5"></i>
+              <div>
+                <strong class="d-block text-info">
+                  {{ (reserva.servicio?.categoria | uppercase) === 'HOTEL' ? 'Estancia:' : 'Fecha:' }}
+                </strong>
+                <span>
+                  @if ((reserva.servicio?.categoria | uppercase) === 'HOTEL') {
+                    {{ reserva.fechaInicio | date:'dd/MM/yyyy' }} - {{ reserva.fechaFin | date:'dd/MM/yyyy' }}
+                  } @else {
+                    {{ (reserva.fechaInicio || reserva.servicio?.fechaInicio) | date:'dd/MM/yyyy' }}
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <i class="bi bi-people text-info me-2 fs-5"></i>
+              <div>
+                <strong class="d-block text-info">Participantes:</strong>
+                <span>{{ reserva.cantidadPersonas ?? 1 }}</span>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <i class="bi bi-wallet2 text-info me-2 fs-5"></i>
+              <div>
+                <strong class="d-block text-info">Total:</strong>
+                <span>{{ reserva.precioTotal | currency:'USD':'symbol' }}</span>
+              </div>
             </div>
           </div>
 
-          <div class="d-flex align-items-center">
-            <i class="bi bi-people text-info me-2 fs-5"></i>
-            <div>
-              <strong class="d-block text-info">Participantes:</strong>
-              <span>{{ reserva.cantidadPersonas }}</span>
-            </div>
+          <div class="mb-3">
+            <span class="badge rounded-1 px-3 py-2 text-uppercase"
+                  [class.bg-success]="reserva.estado === 'CONFIRMADA'"
+                  [class.bg-warning]="reserva.estado !== 'CONFIRMADA'">
+              {{ reserva.estado }}
+            </span>
           </div>
 
-          <div class="d-flex align-items-center">
-            <i class="bi bi-wallet2 text-info me-2 fs-5"></i>
-            <div>
-              <strong class="d-block text-info">Costo Total:</strong>
-              <span>{{ reserva.precioTotal | currency:'EUR':'symbol' }}</span>
-            </div>
+          <div class="mt-auto border-top border-info pt-3">
+            <button class="btn btn-outline-danger w-100 rounded-1"
+                    (click)="cancelarReserva(reserva.id)">
+              <i class="bi bi-trash"></i> Cancelar
+            </button>
           </div>
-        </div>
-
-        <div class="mb-3">
-          <span class="badge rounded-1 px-3 py-2 text-uppercase"
-                [ngClass]="reserva.estado === 'CONFIRMADA' ? 'bg-success' : 'bg-warning text-dark'">
-            {{ reserva.estado }}
-          </span>
-        </div>
-
-        <div class="mt-auto border-top border-info pt-3">
-          <button class="btn btn-outline-danger w-100 rounded-1"
-                  (click)="cancelarReserva(reserva.id)">
-            <i class="bi bi-trash"></i> Cancelar
-          </button>
         </div>
       </div>
-    </div>
+    }
   }
 </div>

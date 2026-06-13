@@ -200,10 +200,12 @@
               </div>
             </div>
 
+            <!-- Botón con lógica de disponibilidad -->
             <button (click)="irAConfirmar()"
+                    [disabled]="!hayPlazasDisponibles()"
                     class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow-sm border-0 text-white"
-                    style="background-color: #ff6b35;">
-              {{ isLoggedIn() ? 'Reservar ahora' : 'Inicia sesión para reservar' }}
+                    [style.background-color]="hayPlazasDisponibles() ? '#ff6b35' : '#ccc'">
+              {{ hayPlazasDisponibles() ? (isLoggedIn() ? 'Reservar ahora' : 'Inicia sesión para reservar') : 'Sin plazas disponibles' }}
             </button>
           </div>
 

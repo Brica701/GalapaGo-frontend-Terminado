@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminServiciosService } from '../../../services/admin-servicios.service';
 import { BusquedaService } from '../../../services/busqueda.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-servicios',
@@ -14,6 +15,7 @@ export class AdminServiciosComponent implements OnInit {
   private servicioService = inject(AdminServiciosService);
   private busquedaService = inject(BusquedaService);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   servicios: any[] = [];
   editando = false;
@@ -29,6 +31,10 @@ export class AdminServiciosComponent implements OnInit {
 
   ngOnInit() {
     this.cargarServicios();
+  }
+
+  volverAlPanel() {
+    this.router.navigate(['/admin/dashboard']);
   }
 
   private getObjetoVacio() {

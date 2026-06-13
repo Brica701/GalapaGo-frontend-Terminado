@@ -10,7 +10,6 @@ import { ReservaService } from '../../services/reserva-service';
   styleUrl: './mis-reservas.css',
 })
 export class MisReservas implements OnInit {
-
   private reservaService = inject<ReservaService>(ReservaService);
 
   misReservas = signal<any[]>([]);
@@ -19,15 +18,18 @@ export class MisReservas implements OnInit {
     this.cargarMisReservas();
   }
 
+
   cargarMisReservas() {
-    this.reservaService.obtenerMisReservas().subscribe({
-      next: (data) => {
+
+    const usuarioGuardado = localStorage.getItem('usuarioLogueado');
+    if (usuarioGuardado) {
+      const usuario = JSON.parse(usuarioGuardado);
+
+
+      this.reservaService.obtenerMisReservas(usuario.id).subscribe((data) => {
         this.misReservas.set(data);
-      },
-      error: (err) => {
-        console.error('Error al cargar las reservas del usuario:', err);
-      },
-    });
+      });
+    }
   }
 
   cancelarReserva(id: number) {

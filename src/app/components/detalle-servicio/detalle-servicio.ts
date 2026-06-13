@@ -45,42 +45,27 @@ export class DetalleServicioComponent implements OnInit {
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
 
-    const encontrado = this.busquedaService.servicios().find((s) => s.id === id);
-
-    if (encontrado) {
-      this.servicio.set(encontrado);
-    } else {
-      this.cargarDatosFrescos(id);
-    }
-
+    this.cargarDatosFrescos(id);
     this.cargarComentarios();
   }
 
   cargarDatosFrescos(id: number) {
-    this.http.get(`https://galapago-backend-terminado.onrender.com/api/servicios/${id}`).subscribe({
-      next: (data: any) => this.servicio.set(data),
-      error: () => this.router.navigate(['/']),
-    });
+    const timestamp = new Date().getTime();
+    this.http
+      .get(`https://galapago-backend-terminado.onrender.com/api/servicios/${id}?t=${timestamp}`)
+      .subscribe({
+        next: (data: any) => {
+          this.servicio.set(data);
+          this.busquedaService.actualizarServicioLocal(data);
+        },
+        error: () => this.router.navigate(['/']),
+      });
   }
 
   confirmarReservaFinal() {
     const usuarioActual = this.busquedaService.datosUsuario();
     const servicioActual = this.servicio();
     if (!usuarioActual?.id) return;
-
-    const estadoPrevio = JSON.parse(JSON.stringify(servicioActual));
-
-    const nuevoServicio = { ...servicioActual };
-    if (nuevoServicio.categoria === 'EXCURSION') {
-      nuevoServicio.cupoDisponible -= this.cantidadPersonas;
-    } else if (nuevoServicio.categoria === 'HOTEL') {
-      const hab = nuevoServicio.habitaciones.find(
-        (h: any) => h.tipo === this.tipoHabitacionSeleccionada,
-      );
-      if (hab) hab.cantidadTotal -= this.cantidadHabitaciones;
-    }
-
-    this.servicio.set(nuevoServicio);
 
     const totalPersonas =
       servicioActual.categoria === 'HOTEL'
@@ -102,19 +87,22 @@ export class DetalleServicioComponent implements OnInit {
 
     this.reservaService.guardar(reservaData).subscribe({
       next: (reservaCreada: any) => {
-        this.busquedaService.actualizarServicioLocal(nuevoServicio);
-
-        this.router.navigate(['/pago', reservaCreada.id], {
-          state: { precio: this.calcularPrecioDinamico() },
-        });
+        const timestamp = new Date().getTime();
+        this.http
+          .get(
+            `https://galapago-backend-terminado.onrender.com/api/servicios/${servicioActual.id}?t=${timestamp}`,
+          )
+          .subscribe((datosActualizados: any) => {
+            this.servicio.set(datosActualizados);
+            this.router.navigate(['/pago', reservaCreada.id], {
+              state: { precio: this.calcularPrecioDinamico() },
+            });
+          });
       },
-      error: (err) => {
-
-        this.servicio.set(estadoPrevio);
-        alert(`❌ Error al procesar: ${err.error?.message || 'Inténtalo de nuevo'}`);
-      },
+      error: (err) => alert(`❌ ${err.error?.message || 'Error'}`),
     });
   }
+
   isAdmin(): boolean {
     return (
       this.busquedaService.datosUsuario()?.rol === 'ADMIN' ||
@@ -201,5 +189,21 @@ export class DetalleServicioComponent implements OnInit {
       );
     }
     return s.precioBase * this.cantidadPersonas;
+  }
+
+  hayPlazasDisponibles(): boolean {
+    const s = this.servicio();
+    if (!s) return false;
+
+    if (s.categoria === 'EXCURSION') {
+      return s.cupoDisponible > 0;
+    }
+
+    if (s.categoria === 'HOTEL') {
+
+      return s.habitaciones?.some((h: any) => h.cantidadTotal > 0);
+    }
+
+    return false;
   }
 }

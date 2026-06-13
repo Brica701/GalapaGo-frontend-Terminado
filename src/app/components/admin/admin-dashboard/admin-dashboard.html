@@ -1,11 +1,11 @@
 <div class="container mt-5">
-  <div class="d-flex justify-content-between align-items-end mb-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5 gap-3">
     <div>
       <h2 class="fw-bolder text-dark mb-1">Centro de Control</h2>
       <p class="text-secondary m-0">Gestionando la aventura en <span class="fw-bold" style="color: #00afca;">GalapaGo</span></p>
     </div>
 
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
       <a routerLink="/admin/servicios" class="btn btn-dark rounded-pill px-4 shadow-sm border-0">
         <i class="bi bi-houses-fill me-2"></i> Servicios
       </a>
@@ -22,7 +22,7 @@
   </div>
 
   <div class="row g-4 mb-5" *ngIf="stats">
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
       <div class="card border-0 shadow-lg h-100 rounded-5 overflow-hidden">
         <div class="p-1" style="background-color: #00afca;"></div>
         <div class="card-body p-4">
@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
       <div class="card border-0 shadow-lg h-100 rounded-5 overflow-hidden">
         <div class="p-1" style="background-color: #ff6b35;"></div>
         <div class="card-body p-4">
@@ -48,7 +48,7 @@
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
           <thead class="bg-light">
           <tr>
             <th class="ps-4 text-secondary py-3">Referencia</th>
@@ -62,7 +62,7 @@
           <tbody>
           <tr *ngIf="reservas.length === 0">
             <td colspan="6" class="text-center py-5 text-muted">
-              <i class="bi bi-info-circle fs-4 d-block mb-2"></i> No se registran movimientos o reservas vigentes en el sistema.
+              <i class="bi bi-info-circle fs-4 d-block mb-2"></i> No se registran movimientos.
             </td>
           </tr>
 
@@ -82,27 +82,18 @@
                   <span class="badge rounded-pill bg-light text-dark border small me-1">{{ reserva.servicio?.categoria }}</span>
                   {{ reserva.servicio?.nombre }}
                 </div>
-
                 <div class="mt-1">
                   <small class="text-primary fw-semibold" *ngIf="reserva.servicio?.categoria === 'HOTEL'">
-                    <i class="bi bi-calendar3 me-1"></i>
-                    {{ reserva.fechaInicio | date:'dd/MM/yyyy' }} al {{ reserva.fechaFin | date:'dd/MM/yyyy' }}
+                    <i class="bi bi-calendar-range me-1"></i>
+                    Estadía: {{ reserva.fechaInicio | date:'dd/MM/yyyy' }} al {{ reserva.fechaFin | date:'dd/MM/yyyy' }}
                   </small>
 
-                  <span class="badge bg-warning text-dark rounded-pill fw-bold px-2.5 py-1 small" *ngIf="reserva.servicio?.categoria === 'EXCURSION'">
-                    <i class="bi bi-calendar-event-fill me-1"></i> Día del evento: {{ reserva.fechaInicio | date:'dd/MM/yyyy' }}
+                  <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill fw-bold px-2 py-1 small"
+                        *ngIf="reserva.servicio?.categoria === 'EXCURSION'">
+                    <i class="bi bi-calendar-event-fill me-1"></i>
+                    Día del evento: {{ (reserva.fechaInicio || reserva.servicio?.fechaInicio) | date:'dd/MM/yyyy' }}
                   </span>
                 </div>
-
-                <small class="text-muted mt-1" *ngIf="reserva.servicio?.categoria === 'EXCURSION'">
-                  <i class="bi bi-people-fill me-1"></i> {{ reserva.cantidadPersonas }} plazas reservadas
-                </small>
-
-                <small class="text-muted mt-1" *ngIf="reserva.servicio?.categoria === 'HOTEL'">
-                  <i class="bi bi-door-open-fill me-1"></i>
-                  Tarifa: <strong class="text-dark">{{ reserva.habitacion?.tipo || reserva.tipoHabitacion }}</strong>
-                  ({{ reserva.cantidadHabitaciones }} {{ reserva.cantidadHabitaciones === 1 ? 'hab.' : 'habs.' }})
-                </small>
               </div>
             </td>
             <td>
@@ -122,14 +113,12 @@
               <div class="d-flex justify-content-center gap-2">
                 <button class="btn btn-sm btn-success rounded-pill px-3 shadow-sm fw-bold"
                         *ngIf="reserva.estado === 'CONFIRMADA'"
-                        (click)="marcarComoPagada(reserva.id)"
-                        title="Registrar pago">
-                  <i class="bi bi-check2-circle"></i> Pago
+                        (click)="marcarComoPagada(reserva.id)">
+                  <i class="bi bi-check2-circle"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold"
                         *ngIf="reserva.estado !== 'CANCELADA'"
-                        (click)="cancelarReserva(reserva.id)"
-                        title="Anular reserva">
+                        (click)="cancelarReserva(reserva.id)">
                   <i class="bi bi-x-lg"></i>
                 </button>
               </div>
