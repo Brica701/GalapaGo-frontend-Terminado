@@ -109,15 +109,15 @@
         <div class="card p-4 mb-4 rounded-4 shadow-sm border-0 bg-light" *ngIf="isLoggedIn()">
           <h6 class="fw-bold">Deja tu opinión</h6>
           <form #comentarioForm="ngForm">
-            <select [(ngModel)]="puntuacion" name="puntuacion" class="form-select mb-2 w-25" required>
+            <select [(ngModel)]="puntuacion" name="puntuacion" class="form-select mb-2 w-25">
               <option value="5">5 ⭐⭐⭐⭐⭐</option>
               <option value="4">4 ⭐⭐⭐⭐</option>
               <option value="3">3 ⭐⭐⭐</option>
               <option value="2">2 ⭐⭐</option>
               <option value="1">1 ⭐</option>
             </select>
-            <textarea [(ngModel)]="textoComentario" name="texto" class="form-control mb-2" placeholder="Cuéntanos qué tal tu experiencia..." required minlength="5"></textarea>
-            <button (click)="enviarComentario()" [disabled]="comentarioForm.invalid" class="btn btn-primary rounded-pill">Publicar opinión</button>
+            <textarea [(ngModel)]="textoComentario" name="texto" class="form-control mb-2" placeholder="Cuéntanos qué tal tu experiencia..."></textarea>
+            <button (click)="enviarComentario()" class="btn btn-primary rounded-pill">Publicar opinión</button>
           </form>
         </div>
 
@@ -201,10 +201,9 @@
             </div>
 
             <button (click)="irAConfirmar()"
-                    [disabled]="!hayPlazasDisponibles()"
                     class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow-sm border-0 text-white"
-                    [style.background-color]="hayPlazasDisponibles() ? '#ff6b35' : '#ccc'">
-              {{ hayPlazasDisponibles() ? (isLoggedIn() ? 'Reservar ahora' : 'Inicia sesión para reservar') : 'Sin plazas disponibles' }}
+                    [style.background-color]="'#ff6b35'">
+              {{ isLoggedIn() ? 'Reservar ahora' : 'Inicia sesión para reservar' }}
             </button>
           </div>
 
@@ -221,15 +220,11 @@
                 <div *ngIf="s.categoria === 'HOTEL'">
                   <label class="small fw-bold text-secondary mb-1">Fecha de Entrada</label>
                   <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2 mb-2"
-                         [min]="getFechaMinima()" name="fInicio" [(ngModel)]="fechaInicio" required #fInicio="ngModel">
+                         [min]="getFechaMinima()" name="fInicio" [(ngModel)]="fechaInicio">
 
                   <label class="small fw-bold text-secondary mb-1">Fecha de Salida</label>
                   <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2"
-                         [min]="fechaInicio" name="fFin" [(ngModel)]="fechaFin" required #fFin="ngModel">
-
-                  <div *ngIf="(fInicio.touched || fFin.touched) && fInicio.value >= fFin.value" class="text-danger small mt-1">
-                    La fecha de salida debe ser posterior a la de entrada.
-                  </div>
+                         [min]="fechaInicio" name="fFin" [(ngModel)]="fechaFin">
                 </div>
 
                 <div *ngIf="s.categoria === 'EXCURSION'">
@@ -250,9 +245,9 @@
 
               <div class="mb-4" *ngIf="s.categoria === 'HOTEL'">
                 <label class="small fw-bold text-secondary mb-1">Tipo de Alojamiento</label>
-                <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada" required #tipoHab="ngModel">
+                <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada">
                   <option value="" disabled selected>Elige una opción...</option>
-                  <option *ngFor="let hab of s.habitaciones" [value]="hab.tipo" [disabled]="hab.cantidadTotal <= 0">
+                  <option *ngFor="let hab of s.habitaciones" [value]="hab.tipo">
                     {{ hab.tipo }} - ${{ hab.precioPorNoche }}/noche
                   </option>
                 </select>
@@ -266,7 +261,6 @@
               </div>
 
               <button (click)="confirmarReservaFinal()"
-                      [disabled]="!isLoggedIn() || reservaForm.invalid || (s.categoria === 'HOTEL' && fechaInicio >= fechaFin)"
                       class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow"
                       style="background-color: #004e64; color: white; border: none;">
                 Ir a Pagar

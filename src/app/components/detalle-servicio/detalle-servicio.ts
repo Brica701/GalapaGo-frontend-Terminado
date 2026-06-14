@@ -70,30 +70,51 @@ export class DetalleServicioComponent implements OnInit {
   confirmarReservaFinal() {
     const usuarioActual = this.busquedaService.datosUsuario();
     const servicioActual = this.servicio();
-    if (!usuarioActual?.id) return;
 
-    if (servicioActual.categoria === 'HOTEL' && this.fechaInicio >= this.fechaFin) {
-      alert('La fecha de salida debe ser posterior a la de entrada.');
+    if (!usuarioActual?.id || !servicioActual) {
+      alert('Error: Datos de usuario o servicio no encontrados.');
       return;
     }
 
-    const totalPersonas =
-      servicioActual.categoria === 'HOTEL'
-        ? this.cantidadPersonas * this.cantidadHabitaciones
-        : this.cantidadPersonas;
+    // --- CORRECCIÓN AQUÍ: Asegurar fechas válidas ---
+    let fInicio = this.fechaInicio;
+    let fFin = this.fechaFin;
 
-    const reservaData = {
+    if (servicioActual.categoria === 'EXCURSION') {
+      fInicio = servicioActual.fechaInicio;
+      fFin = servicioActual.fechaInicio;
+    }
+
+    if (!fInicio || !fFin) {
+      alert('Por favor, selecciona fechas válidas.');
+      return;
+    }
+    // --------------------------------------------------
+
+    // Construcción del objeto
+    const reservaData: any = {
       usuario: { id: usuarioActual.id },
       servicio: { id: servicioActual.id },
-      habitacion:
-        servicioActual.categoria === 'HOTEL' ? { id: this.getHabitacionActual()?.id } : null,
-      fechaInicio: this.fechaInicio,
-      fechaFin: servicioActual.categoria === 'HOTEL' ? this.fechaFin : this.fechaInicio,
-      cantidadPersonas: totalPersonas,
-      cantidadHabitaciones: servicioActual.categoria === 'HOTEL' ? this.cantidadHabitaciones : 0,
-      tipoHabitacion: servicioActual.categoria === 'HOTEL' ? this.tipoHabitacionSeleccionada : null,
+      fechaInicio: fInicio,
+      fechaFin: fFin,
+      cantidadPersonas:
+        servicioActual.categoria === 'HOTEL'
+          ? this.cantidadPersonas * this.cantidadHabitaciones
+          : this.cantidadPersonas,
       estado: 'PENDIENTE',
     };
+
+    // Si es hotel, agregamos datos específicos de habitación
+    if (servicioActual.categoria === 'HOTEL') {
+      const habitacionSeleccionada = this.getHabitacionActual();
+      reservaData.habitacion = habitacionSeleccionada ? { id: habitacionSeleccionada.id } : null;
+      reservaData.cantidadHabitaciones = this.cantidadHabitaciones;
+      reservaData.tipoHabitacion = this.tipoHabitacionSeleccionada;
+    } else {
+      reservaData.habitacion = null;
+      reservaData.cantidadHabitaciones = 0;
+      reservaData.tipoHabitacion = null;
+    }
 
     this.reservaService.guardar(reservaData).subscribe({
       next: (reservaCreada: any) => {
@@ -102,10 +123,12 @@ export class DetalleServicioComponent implements OnInit {
           state: { precio: this.calcularPrecioDinamico() },
         });
       },
-      error: (err) => alert(`❌ ${err.error?.message || 'Error al guardar reserva'}`),
+      error: (err) => {
+        console.error('Detalle del error del Backend:', err);
+        alert(`Error al guardar: ${err.error?.message || 'Revisa la consola para más detalles'}`);
+      },
     });
   }
-
 
   isAdmin(): boolean {
     return (
