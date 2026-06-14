@@ -13,11 +13,9 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./lista-servicios.css'],
 })
 export class ListaServiciosComponent implements OnInit {
-
   busquedaService = inject(BusquedaService);
   private adminService = inject(AdminServiciosService);
   private comentarioService = inject(ComentarioService);
-
 
   servicios = this.busquedaService.servicios;
 
@@ -26,7 +24,6 @@ export class ListaServiciosComponent implements OnInit {
   }
 
   ngOnInit() {
-
     if (this.servicios().length === 0) {
       this.cargarServiciosDesdeBD();
     } else {
@@ -83,20 +80,19 @@ export class ListaServiciosComponent implements OnInit {
 
     let lista = [...listaOriginal];
 
-    if (filtro === 'DESTACADOS') {
-      lista = lista.filter((s) => s?.destacado === true);
-    } else {
-      lista = lista.filter((s) => (s?.categoria ?? '').toUpperCase() === filtro);
-    }
-
-    if (texto) {
-      lista = lista.filter(
+    if (texto !== '') {
+      return lista.filter(
         (s) =>
-          (s?.nombre ?? '').toLowerCase().includes(texto) ||
-          (s?.ubicacion ?? '').toLowerCase().includes(texto),
+          s?.nombre?.toLowerCase().includes(texto) ||
+          s?.ubicacion?.toLowerCase().includes(texto) ||
+          s?.categoria?.toLowerCase().includes(texto),
       );
     }
 
-    return lista;
+    if (filtro === 'DESTACADOS') {
+      return lista.filter((s) => s?.destacado === true);
+    } else {
+      return lista.filter((s) => (s?.categoria ?? '').toUpperCase() === filtro);
+    }
   });
 }

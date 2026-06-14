@@ -11,7 +11,7 @@ import { Spanish } from 'flatpickr/dist/l10n/es.js';
   standalone: true,
   imports: [RouterOutlet, RouterLink, CommonModule, FooterComponent],
   templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  styleUrls: ['./app.css'],
 })
 export class App implements AfterViewInit {
   router = inject(Router);
@@ -20,7 +20,6 @@ export class App implements AfterViewInit {
   adultos = signal(2);
   habitaciones = signal(1);
   mostrarPersonas = signal(false);
-
 
   usuario: any = null;
 
@@ -48,37 +47,33 @@ export class App implements AfterViewInit {
       locale: Spanish,
       dateFormat: 'd M',
 
-      defaultDate: this.busquedaService.fechaInicio() && this.busquedaService.fechaFin()
-        ? [this.busquedaService.fechaInicio()!, this.busquedaService.fechaFin()!]
-        : [],
+      defaultDate:
+        this.busquedaService.fechaInicio() && this.busquedaService.fechaFin()
+          ? [this.busquedaService.fechaInicio()!, this.busquedaService.fechaFin()!]
+          : [],
       onChange: (selectedDates) => {
         if (selectedDates.length === 2) {
           const inicio = selectedDates[0];
           const fin = selectedDates[1];
 
-
           this.busquedaService.fechaInicio.set(inicio);
           this.busquedaService.fechaFin.set(fin);
 
-
           const diff = fin.getTime() - inicio.getTime();
           const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
-
 
           const nochesCalculadas = dias > 0 ? dias : 1;
           this.busquedaService.noches.set(nochesCalculadas);
 
           console.log('Fechas actualizadas:', inicio, fin, 'Noches:', nochesCalculadas);
         }
-      }
+      },
     });
   }
 
-
   togglePersonas() {
-    this.mostrarPersonas.update(v => !v);
+    this.mostrarPersonas.update((v) => !v);
   }
-
 
   actualizarContador(tipo: 'adultos' | 'habitaciones', cantidad: number) {
     if (tipo === 'adultos') {

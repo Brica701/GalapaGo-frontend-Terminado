@@ -91,4 +91,17 @@ export class BusquedaService {
   actualizarServicioLocal(editado: any) {
     this.servicios.update((actual) => actual.map((s: any) => (s.id === editado.id ? editado : s)));
   }
+
+
+  filtrarServiciosGlobal() {
+    const termino = this.textoBusqueda().toLowerCase();
+    if (!termino) return this.servicios();
+
+    return this.servicios().filter(
+      (s) =>
+        s.nombre.toLowerCase().includes(termino) ||
+        s.categoria.toLowerCase().includes(termino) ||
+        s.ubicacion?.toLowerCase().includes(termino),
+    );
+  }
 }

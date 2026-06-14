@@ -200,7 +200,6 @@
               </div>
             </div>
 
-            <!-- Botón con lógica de disponibilidad -->
             <button (click)="irAConfirmar()"
                     [disabled]="!hayPlazasDisponibles()"
                     class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow-sm border-0 text-white"
@@ -222,11 +221,11 @@
                 <div *ngIf="s.categoria === 'HOTEL'">
                   <label class="small fw-bold text-secondary mb-1">Fecha de Entrada</label>
                   <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2 mb-2"
-                         name="fInicio" [(ngModel)]="fechaInicio" required #fInicio="ngModel">
+                         [min]="getFechaMinima()" name="fInicio" [(ngModel)]="fechaInicio" required #fInicio="ngModel">
 
                   <label class="small fw-bold text-secondary mb-1">Fecha de Salida</label>
                   <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2"
-                         name="fFin" [(ngModel)]="fechaFin" required #fFin="ngModel">
+                         [min]="fechaInicio" name="fFin" [(ngModel)]="fechaFin" required #fFin="ngModel">
 
                   <div *ngIf="(fInicio.touched || fFin.touched) && fInicio.value >= fFin.value" class="text-danger small mt-1">
                     La fecha de salida debe ser posterior a la de entrada.
@@ -241,12 +240,7 @@
               </div>
 
               <div class="mb-3">
-                <label class="small fw-bold text-secondary mb-1 d-flex justify-content-between align-items-center w-100">
-                  <span>¿Cuántas personas?</span>
-                  <span class="badge bg-warning text-dark" *ngIf="s.categoria === 'EXCURSION'">
-                    🔥 Quedan {{ s.cupoDisponible }} plazas
-                  </span>
-                </label>
+                <label class="small fw-bold text-secondary mb-1">¿Cuántas personas?</label>
                 <div class="d-flex align-items-center gap-3 bg-light p-2 rounded-4">
                   <button type="button" (click)="cantidadPersonas = cantidadPersonas > 1 ? cantidadPersonas - 1 : 1" class="btn btn-sm btn-white shadow-sm rounded-circle border-0">-</button>
                   <span class="flex-grow-1 text-center fw-bold">{{ cantidadPersonas }}</span>
@@ -255,15 +249,13 @@
               </div>
 
               <div class="mb-4" *ngIf="s.categoria === 'HOTEL'">
-                <div class="mb-3">
-                  <label class="small fw-bold text-secondary mb-1">Tipo de Alojamiento</label>
-                  <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada" required #tipoHab="ngModel">
-                    <option value="" disabled selected>Elige un tipo de habitación...</option>
-                    <option *ngFor="let hab of s.habitaciones" [value]="hab.tipo" [disabled]="hab.cantidadTotal <= 0">
-                      {{ hab.tipo }} - ${{ hab.precioPorNoche }}/noche
-                    </option>
-                  </select>
-                </div>
+                <label class="small fw-bold text-secondary mb-1">Tipo de Alojamiento</label>
+                <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada" required #tipoHab="ngModel">
+                  <option value="" disabled selected>Elige una opción...</option>
+                  <option *ngFor="let hab of s.habitaciones" [value]="hab.tipo" [disabled]="hab.cantidadTotal <= 0">
+                    {{ hab.tipo }} - ${{ hab.precioPorNoche }}/noche
+                  </option>
+                </select>
               </div>
 
               <div class="rounded-4 p-3 mb-4" style="background-color: #f8fdff; border: 1px solid #e1f5f9;">
@@ -276,9 +268,7 @@
               <button (click)="confirmarReservaFinal()"
                       [disabled]="!isLoggedIn() || reservaForm.invalid || (s.categoria === 'HOTEL' && fechaInicio >= fechaFin)"
                       class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow"
-                      [style.background-color]="(isLoggedIn() && reservaForm.valid && (s.categoria !== 'HOTEL' || fechaInicio < fechaFin)) ? '#004e64' : '#e9ecef'"
-                      [style.color]="(isLoggedIn() && reservaForm.valid && (s.categoria !== 'HOTEL' || fechaInicio < fechaFin)) ? 'white' : '#6c757d'"
-                      style="border: none;">
+                      style="background-color: #004e64; color: white; border: none;">
                 Ir a Pagar
               </button>
             </form>

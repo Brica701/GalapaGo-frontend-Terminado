@@ -44,9 +44,14 @@ export class DetalleServicioComponent implements OnInit {
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-
     this.cargarDatosFrescos(id);
     this.cargarComentarios();
+  }
+
+  getFechaMinima(): string {
+    const hoy = new Date();
+
+    return hoy.toISOString().split('T')[0];
   }
 
   cargarDatosFrescos(id: number) {
@@ -66,6 +71,11 @@ export class DetalleServicioComponent implements OnInit {
     const usuarioActual = this.busquedaService.datosUsuario();
     const servicioActual = this.servicio();
     if (!usuarioActual?.id) return;
+
+    if (servicioActual.categoria === 'HOTEL' && this.fechaInicio >= this.fechaFin) {
+      alert('La fecha de salida debe ser posterior a la de entrada.');
+      return;
+    }
 
     const totalPersonas =
       servicioActual.categoria === 'HOTEL'
@@ -87,21 +97,15 @@ export class DetalleServicioComponent implements OnInit {
 
     this.reservaService.guardar(reservaData).subscribe({
       next: (reservaCreada: any) => {
-        const timestamp = new Date().getTime();
-        this.http
-          .get(
-            `https://galapago-backend-terminado.onrender.com/api/servicios/${servicioActual.id}?t=${timestamp}`,
-          )
-          .subscribe((datosActualizados: any) => {
-            this.servicio.set(datosActualizados);
-            this.router.navigate(['/pago', reservaCreada.id], {
-              state: { precio: this.calcularPrecioDinamico() },
-            });
-          });
+        this.reservaConfirmada.set(true);
+        this.router.navigate(['/pago', reservaCreada.id], {
+          state: { precio: this.calcularPrecioDinamico() },
+        });
       },
-      error: (err) => alert(`❌ ${err.error?.message || 'Error'}`),
+      error: (err) => alert(`❌ ${err.error?.message || 'Error al guardar reserva'}`),
     });
   }
+
 
   isAdmin(): boolean {
     return (
@@ -111,7 +115,7 @@ export class DetalleServicioComponent implements OnInit {
   }
 
   eliminarComentario(id: number) {
-    if (confirm('¿Eliminar?'))
+    if (confirm('¿Eliminar comentario?'))
       this.comentarioService.eliminar(id).subscribe(() => this.cargarComentarios());
   }
 
@@ -164,13 +168,6 @@ export class DetalleServicioComponent implements OnInit {
     return s?.habitaciones?.find((h: any) => h.tipo === this.tipoHabitacionSeleccionada);
   }
 
-  getOpcionesHabitaciones(): number[] {
-    const hab = this.getHabitacionActual();
-    return hab
-      ? Array.from({ length: Math.min(hab.cantidadTotal, 4) }, (_, i) => i + 1)
-      : [1, 2, 3, 4];
-  }
-
   calcularNochesLocales(): number {
     if (!this.fechaInicio || !this.fechaFin) return 1;
     const d = (new Date(this.fechaFin).getTime() - new Date(this.fechaInicio).getTime()) / 86400000;
@@ -193,17 +190,10 @@ export class DetalleServicioComponent implements OnInit {
 
   hayPlazasDisponibles(): boolean {
     const s = this.servicio();
-    if (!s) return false;
-
-    if (s.categoria === 'EXCURSION') {
-      return s.cupoDisponible > 0;
-    }
-
-    if (s.categoria === 'HOTEL') {
-
-      return s.habitaciones?.some((h: any) => h.cantidadTotal > 0);
-    }
-
-    return false;
+    return s
+      ? s.categoria === 'EXCURSION'
+        ? s.cupoDisponible > 0
+        : s.habitaciones?.some((h: any) => h.cantidadTotal > 0)
+      : false;
   }
 }
