@@ -76,7 +76,6 @@ export class DetalleServicioComponent implements OnInit {
       return;
     }
 
-    // --- CORRECCIÓN AQUÍ: Asegurar fechas válidas ---
     let fInicio = this.fechaInicio;
     let fFin = this.fechaFin;
 
@@ -89,9 +88,9 @@ export class DetalleServicioComponent implements OnInit {
       alert('Por favor, selecciona fechas válidas.');
       return;
     }
-    // --------------------------------------------------
 
-    // Construcción del objeto
+
+
     const reservaData: any = {
       usuario: { id: usuarioActual.id },
       servicio: { id: servicioActual.id },
@@ -104,7 +103,7 @@ export class DetalleServicioComponent implements OnInit {
       estado: 'PENDIENTE',
     };
 
-    // Si es hotel, agregamos datos específicos de habitación
+
     if (servicioActual.categoria === 'HOTEL') {
       const habitacionSeleccionada = this.getHabitacionActual();
       reservaData.habitacion = habitacionSeleccionada ? { id: habitacionSeleccionada.id } : null;
