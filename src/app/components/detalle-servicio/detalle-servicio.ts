@@ -89,8 +89,6 @@ export class DetalleServicioComponent implements OnInit {
       return;
     }
 
-
-
     const reservaData: any = {
       usuario: { id: usuarioActual.id },
       servicio: { id: servicioActual.id },
@@ -102,7 +100,6 @@ export class DetalleServicioComponent implements OnInit {
           : this.cantidadPersonas,
       estado: 'PENDIENTE',
     };
-
 
     if (servicioActual.categoria === 'HOTEL') {
       const habitacionSeleccionada = this.getHabitacionActual();
@@ -218,4 +215,7 @@ export class DetalleServicioComponent implements OnInit {
         : s.habitaciones?.some((h: any) => h.cantidadTotal > 0)
       : false;
   }
+
+
+
 }

@@ -220,11 +220,11 @@
                 <div *ngIf="s.categoria === 'HOTEL'">
                   <label class="small fw-bold text-secondary mb-1">Fecha de Entrada</label>
                   <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2 mb-2"
-                         [min]="getFechaMinima()" name="fInicio" [(ngModel)]="fechaInicio">
+                         [min]="getFechaMinima()" name="fInicio" [(ngModel)]="fechaInicio" required>
 
                   <label class="small fw-bold text-secondary mb-1">Fecha de Salida</label>
                   <input type="date" class="form-control border-0 bg-light rounded-4 shadow-none py-2"
-                         [min]="fechaInicio" name="fFin" [(ngModel)]="fechaFin">
+                         [min]="fechaInicio" name="fFin" [(ngModel)]="fechaFin" required>
                 </div>
 
                 <div *ngIf="s.categoria === 'EXCURSION'">
@@ -245,7 +245,7 @@
 
               <div class="mb-4" *ngIf="s.categoria === 'HOTEL'">
                 <label class="small fw-bold text-secondary mb-1">Tipo de Alojamiento</label>
-                <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada">
+                <select class="form-select border-0 bg-light rounded-4 shadow-none py-2" name="tipoHab" [(ngModel)]="tipoHabitacionSeleccionada" required>
                   <option value="" disabled selected>Elige una opción...</option>
                   <option *ngFor="let hab of s.habitaciones" [value]="hab.tipo">
                     {{ hab.tipo }} - ${{ hab.precioPorNoche }}/noche
@@ -261,8 +261,9 @@
               </div>
 
               <button (click)="confirmarReservaFinal()"
+                      [disabled]="s.categoria === 'HOTEL' && (!fechaInicio || !fechaFin || !tipoHabitacionSeleccionada )"
                       class="btn w-100 fw-bold py-3 fs-5 rounded-pill shadow"
-                      style="background-color: #004e64; color: white; border: none;">
+                      style="background-color: #004e64; color: white; border: none; opacity: 1;">
                 Ir a Pagar
               </button>
             </form>
